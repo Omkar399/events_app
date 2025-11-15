@@ -132,3 +132,4 @@ This is a fully client-side app with no backend - perfect for quick testing and 
 ## License
 
 MIT
+# events_app
