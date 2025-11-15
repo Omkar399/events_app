@@ -1,37 +1,64 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { events, type Event } from './data/events';
 import EventList from './components/EventList';
 import Registrations from './components/Registrations';
 import './App.css';
 
 function App() {
-  const [registrations, setRegistrations] = useState<Event[]>([]);
+  // Load registrations from localStorage on mount
+  const [registrations, setRegistrations] = useState<Event[]>(() => {
+    const saved = localStorage.getItem('eventRegistrations');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [showRegistrations, setShowRegistrations] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
+
+  // Save registrations to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('eventRegistrations', JSON.stringify(registrations));
+  }, [registrations]);
+
+  // Auto-hide notification after 3 seconds
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const handleRegister = (event: Event) => {
     // Check if already registered
     const alreadyRegistered = registrations.find((e) => e.id === event.id);
     if (alreadyRegistered) {
-      alert('You are already registered for this event!');
+      setNotification(`⚠️ Already registered for ${event.title}`);
       return;
     }
 
     setRegistrations((prev) => [...prev, event]);
-    alert(`Successfully registered for ${event.title}!`);
+    setNotification(`✅ Registered for ${event.title}!`);
   };
 
   const handleCancelRegistration = (eventId: number) => {
-    setRegistrations((prev) => prev.filter((event) => event.id !== eventId));
+    const event = registrations.find((e) => e.id === eventId);
+    setRegistrations((prev) => prev.filter((e) => e.id !== eventId));
+    if (event) {
+      setNotification(`❌ Cancelled ${event.title}`);
+    }
   };
 
   const handleClearAll = () => {
-    if (window.confirm('Are you sure you want to cancel all registrations?')) {
-      setRegistrations([]);
-    }
+    setRegistrations([]);
+    setNotification('🗑️ All registrations cleared');
   };
 
   return (
     <div className='app'>
+      {notification && (
+        <div className='notification'>
+          {notification}
+        </div>
+      )}
+      
       <header className='app-header'>
         <h1>🎉 EventHub</h1>
         <button
