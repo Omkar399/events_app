@@ -62,8 +62,6 @@ body {
 .app-main {
   flex: 1;
   padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
   width: 100%;
 }
 
@@ -91,7 +89,7 @@ body {
 /* Event List */
 .event-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   padding: 1rem 0;
 }
@@ -416,7 +414,7 @@ body {
   }
   
   .event-list {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
   
