@@ -12,6 +12,7 @@ function App() {
   });
   const [showRegistrations, setShowRegistrations] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Save registrations to localStorage whenever they change
   useEffect(() => {
@@ -51,6 +52,18 @@ function App() {
     setNotification('🗑️ All registrations cleared');
   };
 
+  // Filter events based on search query
+  const filteredEvents = events.filter((event) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      event.title.toLowerCase().includes(query) ||
+      event.category.toLowerCase().includes(query) ||
+      event.location.toLowerCase().includes(query) ||
+      event.description.toLowerCase().includes(query) ||
+      event.organizer.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className='app'>
       {notification && (
@@ -82,7 +95,29 @@ function App() {
               <h2>Discover Amazing Events</h2>
               <p>Find and register for events happening near you</p>
             </div>
-            <EventList events={events} onRegister={handleRegister} />
+            <div className='search-section'>
+              <input
+                type='text'
+                placeholder='🔍 Search events by title, category, location, or organizer...'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className='search-input'
+              />
+              {searchQuery && (
+                <div className='search-results-info'>
+                  Found {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
+                  {searchQuery && (
+                    <button
+                      className='clear-search'
+                      onClick={() => setSearchQuery('')}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            <EventList events={filteredEvents} onRegister={handleRegister} />
           </>
         )}
       </main>
